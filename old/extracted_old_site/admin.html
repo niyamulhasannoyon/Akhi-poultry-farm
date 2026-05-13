@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon-48.png" type="image/png" sizes="48x48">
+    <link rel="icon" href="favicon.png" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <title>Admin Dashboard - Akhi Poultry Farm | Secure Access</title>
+    <meta name="description"
+        content="Secure admin dashboard for Akhi Poultry Farm management. Login to manage inventory, products, and farm operations.">
+    <meta name="google-site-verification" content="ltiup6bpKyhhKFSzRBY-HvRjYNxMZG84qWukEk0dpjY" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Baloo Da 2', 'Plus Jakarta Sans', sans-serif;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .glass {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gray-900 text-gray-200 min-h-screen selection:bg-green-500 selection:text-white relative overflow-x-hidden">
+
+    <!-- Global Background -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none">
+        <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-green-900/20 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[120px]"></div>
+    </div>
+
+    <!-- Login Overlay -->
+    <div id="login-overlay"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/95 backdrop-blur-md">
+        <div class="glass p-8 rounded-2xl shadow-2xl w-full max-w-md text-center relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition duration-700">
+            </div>
+            <div
+                class="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg shadow-green-900/50">
+                <i class="fa-solid fa-user-shield text-white"></i>
+            </div>
+            <h2 class="text-3xl font-black text-white mb-2">Admin Panel</h2>
+            <p class="text-gray-400 mb-8 text-sm">Secure Gateway for Management</p>
+            <form onsubmit="handleLogin(event)" class="space-y-5 relative z-10">
+                <div class="relative">
+                    <input type="password" id="admin-pin" placeholder="Enter Secure PIN"
+                        class="w-full px-4 py-3.5 rounded-xl bg-gray-800/50 border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-center text-xl tracking-[0.5em] text-white placeholder-gray-600 transition shadow-inner">
+                    <i class="fa-solid fa-lock absolute left-4 top-4 text-gray-600"></i>
+                </div>
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-green-500/30 hover:scale-[1.02] transform transition-all duration-200 uppercase tracking-wider text-sm">Access
+                    Dashboard</button>
+            </form>
+            <p id="error-msg"
+                class="text-red-400 mt-4 text-sm hidden bg-red-500/10 py-2 rounded-lg border border-red-500/20 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-exclamation"></i> Invalid Access PIN
+            </p>
+        </div>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="admin-dashboard" class="hidden flex flex-col min-h-screen">
+        <!-- Navbar -->
+        <nav class="glass sticky top-0 z-40 border-b-0 border-white/5">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center text-green-400 font-bold border border-white/10 shadow-lg">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-xl text-white tracking-tight">Akhi<span
+                                class="text-green-500">Admin</span></span>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Control Center</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <!-- Tab Navigation -->
+                    <div class="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+                        <button onclick="switchTab('products')" id="tab-products"
+                            class="px-4 py-1.5 rounded-md text-sm font-bold bg-gray-700 text-white shadow transition">Products</button>
+                        <button onclick="switchTab('blog')" id="tab-blog"
+                            class="px-4 py-1.5 rounded-md text-sm font-bold text-gray-400 hover:text-white transition">Blog</button>
+                    </div>
+
+                    <button onclick="exportCSV()"
+                        class="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition text-sm font-medium border border-gray-700">
+                        <i class="fa-solid fa-file-csv"></i> Export
+                    </button>
+                    <div class="h-6 w-px bg-gray-700 hidden md:block"></div>
+                    <a href="index.html"
+                        class="px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition text-sm flex items-center"><i
+                            class="fa-solid fa-globe mr-2"></i> Site</a>
+                    <button onclick="logout()"
+                        class="text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2"><i
+                            class="fa-solid fa-power-off"></i></button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+                <!-- Main Content (Stats + Table) -->
+                <div class="lg:col-span-3 space-y-8">
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition"><i
+                                    class="fa-solid fa-boxes-stacked text-6xl text-blue-400"></i></div>
+                            <h3 class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Total Products
+                            </h3>
+                            <p class="text-4xl font-black text-white" id="stat-total-products">0</p>
+                            <div class="mt-4 flex items-center gap-2 text-xs text-blue-400 font-medium"><span
+                                    class="bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20">Active
+                                    Items</span></div>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition"><i
+                                    class="fa-solid fa-coins text-6xl text-green-400"></i></div>
+                            <h3 class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Total Value</h3>
+                            <p class="text-4xl font-black text-white">৳<span id="stat-stock-value">0</span></p>
+                            <div class="mt-4 flex items-center gap-2 text-xs text-green-400 font-medium"><span
+                                    class="bg-green-500/10 px-2 py-1 rounded border border-green-500/20 text-green-400">Inventory
+                                    Worth</span></div>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition"><i
+                                    class="fa-solid fa-triangle-exclamation text-6xl text-red-400"></i></div>
+                            <h3 class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Low Stock</h3>
+                            <p class="text-4xl font-black text-white" id="stat-low-stock">0</p>
+                            <div class="mt-4 flex items-center gap-2 text-xs text-red-400 font-medium"><span
+                                    class="bg-red-500/10 px-2 py-1 rounded border border-red-500/20">Critical
+                                    Items</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Toolbar -->
+                    <div class="glass p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-4 w-full md:w-auto">
+                            <div class="relative w-full md:w-64">
+                                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-500"></i>
+                                <input type="text" id="search-input" placeholder="Search products..."
+                                    onkeyup="renderTable()"
+                                    class="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-white">
+                            </div>
+                            <select id="category-filter" onchange="renderTable()"
+                                class="px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 focus:border-green-500 outline-none">
+                                <option value="all">All Categories</option>
+                                <option value="chicken">Chicken</option>
+                                <option value="chicks">Chicks</option>
+                                <option value="feed">Feed</option>
+                                <option value="medicine">Medicine</option>
+                            </select>
+                        </div>
+                        <button onclick="openModal('add')"
+                            class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-green-900/20 flex items-center gap-2 transition w-full md:w-auto justify-center">
+                            <i class="fa-solid fa-plus"></i> Add Product
+                        </button>
+                    </div>
+
+                    <!-- Product Table -->
+                    <div class="glass rounded-2xl overflow-hidden shadow-2xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="p-5 border-b border-gray-700">Product</th>
+                                        <th class="p-5 border-b border-gray-700">Category</th>
+                                        <th class="p-5 border-b border-gray-700">Price</th>
+                                        <th class="p-5 border-b border-gray-700">Stock Control</th>
+                                        <th class="p-5 border-b border-gray-700 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-product-list" class="divide-y divide-gray-800 text-sm"></tbody>
+                            </table>
+                        </div>
+                        <div id="empty-state" class="hidden p-12 text-center text-gray-500">
+                            <i class="fa-solid fa-box-open text-4xl mb-3 opacity-50"></i>
+                            <p>No products found.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blog Content (Hidden by default) -->
+                <div id="blog-section" class="lg:col-span-3 space-y-8 hidden">
+                    <!-- Toolbar -->
+                    <div class="glass p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4">
+                        <h2 class="text-xl font-bold text-white"><i
+                                class="fa-solid fa-newspaper text-green-400 mr-2"></i> Blog Posts</h2>
+                        <button onclick="openModal('add-post')"
+                            class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-green-900/20 flex items-center gap-2 transition w-full md:w-auto justify-center">
+                            <i class="fa-solid fa-plus"></i> Add Post
+                        </button>
+                    </div>
+
+                    <!-- Blog Table -->
+                    <div class="glass rounded-2xl overflow-hidden shadow-2xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="p-5 border-b border-gray-700">Post Info</th>
+                                        <th class="p-5 border-b border-gray-700">Category</th>
+                                        <th class="p-5 border-b border-gray-700">Date/Time</th>
+                                        <th class="p-5 border-b border-gray-700 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-blog-list" class="divide-y divide-gray-800 text-sm"></tbody>
+                            </table>
+                        </div>
+                        <div id="empty-blog-state" class="hidden p-12 text-center text-gray-500">
+                            <i class="fa-solid fa-file-pen text-4xl mb-3 opacity-50"></i>
+                            <p>No blog posts found.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar (Activity Log) -->
+                <div class="lg:col-span-1">
+                    <div class="glass rounded-2xl p-6 h-full border border-white/5">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><i
+                                class="fa-solid fa-clock-rotate-left text-green-400"></i> Recent Activity</h3>
+                        <div id="activity-log" class="space-y-4">
+                            <!-- Logs injected here -->
+                            <p class="text-gray-500 text-sm text-center py-4">No recent activity.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="text-center py-6 text-gray-600 text-xs border-t border-gray-800 mt-auto">&copy; 2026 Admin Panel
+            • Akhi Poultry Farm</footer>
+    </div>
+
+    <!-- Edit/Add Modal -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="glass p-8 rounded-2xl shadow-2xl w-full max-w-lg relative z-10 transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                <h3 id="modal-title" class="text-2xl font-bold text-white">Edit Product</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white"><i
+                        class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4">
+                <input type="hidden" id="p-id">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Name</label>
+                        <input type="text" id="p-name" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Category</label>
+                        <select id="p-category" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white appearance-none">
+                            <option value="chicken">Chicken</option>
+                            <option value="chicks">Chicks</option>
+                            <option value="feed">Feed</option>
+                            <option value="gura">Gura</option>
+                            <option value="medicine">Medicine</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Price</label>
+                        <input type="number" id="p-price" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Stock</label>
+                        <input type="number" id="p-stock" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Unit</label>
+                        <input type="text" id="p-unit" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Image URL</label>
+                    <input type="url" id="p-image" required
+                        class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Description</label>
+                    <textarea id="p-desc" rows="2"
+                        class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white text-xs"></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-700">
+                    <button type="button" onclick="closeModal()"
+                        class="px-5 py-2 rounded-xl text-gray-400 hover:bg-gray-800">Cancel</button>
+                    <button type="submit"
+                        class="px-6 py-2 rounded-xl bg-green-600 text-white font-bold hover:bg-green-500 shadow-lg">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Blog Modal -->
+    <div id="blog-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="glass p-8 rounded-2xl shadow-2xl w-full max-w-lg relative z-10 transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                <h3 id="blog-modal-title" class="text-2xl font-bold text-white">Edit Post</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white"><i
+                        class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="blog-form" onsubmit="savePost(event)" class="space-y-4">
+                <input type="hidden" id="post-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Title</label>
+                    <input type="text" id="post-title" required
+                        class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Category</label>
+                        <select id="post-category" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white appearance-none">
+                            <option value="খামার পরামর্শ">খামার পরামর্শ</option>
+                            <option value="পুষ্টি বাৰ্তা">পুষ্টি বাৰ্তা</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Date</label>
+                        <input type="text" id="post-date" placeholder="e.g. ২৮ জানুয়ারী, ২০২৬" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Read Time</label>
+                        <input type="text" id="post-readTime" placeholder="e.g. ৫ মিনিট পড়ুন" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Image URL</label>
+                        <input type="url" id="post-image" required
+                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Description</label>
+                    <textarea id="post-desc" rows="3"
+                        class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl focus:border-green-500 outline-none text-white text-xs"></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-700">
+                    <button type="button" onclick="closeModal()"
+                        class="px-5 py-2 rounded-xl text-gray-400 hover:bg-gray-800">Cancel</button>
+                    <button type="submit"
+                        class="px-6 py-2 rounded-xl bg-green-600 text-white font-bold hover:bg-green-500 shadow-lg">Save
+                        Post</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'akhi_products_v2';
+        const POSTS_KEY = 'akhi_posts';
+        const LOG_KEY = 'akhi_admin_logs';
+        let products = [];
+        let posts = [];
+        let activityLogs = [];
+        const PIN = "1812654991";
+        let currentTab = 'products';
+
+        // Default Data
+        const initialProducts = [
+            { id: 101, name: "Sonali Roast", category: "chicken", price: 340, stock: 40, unit: "kg", image: "https://images.unsplash.com/photo-1615557960916-5f4791effe9d?q=80&w=600", desc: "Premium roast size Sonali chicken." },
+            { id: 102, name: "Sonali Murgi", category: "chicken", price: 320, stock: 60, unit: "kg", image: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=600", desc: "Live regular Sonali chicken." },
+            { id: 103, name: "Broiler Murgi", category: "chicken", price: 180, stock: 150, unit: "kg", image: "https://images.unsplash.com/photo-1587593810167-a84920ea0781?q=80&w=600", desc: "Farm fresh Broiler chicken." },
+            { id: 201, name: "Sonali Starter", category: "feed", price: 3400, stock: 20, unit: "bag", image: "images.jpeg", desc: "Starter feed for Sonali chicks." },
+            { id: 202, name: "Sonali Grower", category: "feed", price: 3300, stock: 25, unit: "bag", image: "images.jpeg", desc: "Grower feed for rapid growth." },
+            { id: 203, name: "Broiler Starter", category: "feed", price: 3500, stock: 15, unit: "bag", image: "images.jpeg", desc: "High protein starter for Broiler." },
+            { id: 204, name: "Broiler Grower", category: "feed", price: 3450, stock: 30, unit: "bag", image: "images.jpeg", desc: "Balanced grower feed." },
+            { id: 301, name: "Dhaner Gura", category: "gura", price: 40, stock: 200, unit: "kg", image: "https://thumbs.dreamstime.com/b/rice-bran-powder-bowl-isolated-white-background-top-view-flat-lay-166291687.jpg", desc: "Fresh rice bran for cattle/poultry." },
+            { id: 401, name: "Sonali Baccha (Adorso)", category: "chicks", price: 45, stock: 0, unit: "pc", image: "https://images.unsplash.com/photo-1579165352523-28682dc193ee?q=80&w=600", desc: "Grade A Adorso Sonali chicks." },
+            { id: 402, name: "Sonali Baccha (Classic)", category: "chicks", price: 40, stock: 0, unit: "pc", image: "https://images.unsplash.com/photo-1579165352523-28682dc193ee?q=80&w=600", desc: "Classic breed Sonali chicks." },
+            { id: 403, name: "Broiler Baccha", category: "chicks", price: 65, stock: 500, unit: "pc", image: "https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=600", desc: "Day old Broiler chicks." },
+            { id: 501, name: "Renamycin", category: "medicine", price: 120, stock: 50, unit: "box", image: "https://www.renata-ltd.com/wp-content/uploads/2021/04/Renamycin-100-Tabs.jpg", desc: "Antibiotic for poultry." },
+            { id: 502, name: "Napa Extra", category: "medicine", price: 30, stock: 100, unit: "strip", image: "https://cdn.osudpotro.com/medicine/napa-extra-500mg-65mg-tablet-1635674064132.webp", desc: "Pain and fever relief." },
+            { id: 503, name: "Amprium Vet (100ml)", category: "medicine", price: 420, stock: 50, unit: "pc", image: "https://www.squarevet.com.bd/assets/product_img/Amprium%20Vet%20100%20ml.jpg", desc: "Square Pharmaceuticals" },
+            { id: 504, name: "Probiozyme (100ml)", category: "medicine", price: 380, stock: 40, unit: "pc", image: "https://www.squarevet.com.bd/assets/product_img/Probiozyme.jpg", desc: "Square Pharmaceuticals" },
+            { id: 505, name: "Mucospel (100ml)", category: "medicine", price: 410, stock: 60, unit: "pc", image: "https://www.squarevet.com.bd/assets/product_img/Mucospel-100m.jpg", desc: "Square Pharmaceuticals" },
+            { id: 506, name: "Neobiotic (100ml)", category: "medicine", price: 450, stock: 35, unit: "pc", image: "https://www.squarevet.com.bd/assets/product_img/Neobiotic.jpg", desc: "Square Pharmaceuticals" },
+            { id: 507, name: "Enflox (100ml)", category: "medicine", price: 460, stock: 45, unit: "pc", image: "https://www.squarevet.com.bd/assets/product_img/Enflox-Solution.jpg", desc: "Square Pharmaceuticals" },
+            { id: 508, name: "Prithi (100ml)", category: "medicine", price: 350, stock: 70, unit: "pc", image: "images.jpeg", desc: "Square Pharmaceuticals" },
+            { id: 509, name: "Respiron (500ml)", category: "medicine", price: 980, stock: 20, unit: "pc", image: "https://www.squarevet.com.bd/assets/product_img/Respiron.jpg", desc: "Square Pharmaceuticals" },
+            { id: 510, name: "Fusid (100ml)", category: "medicine", price: 430, stock: 55, unit: "pc", image: "https://www.squarevet.com.bd/assets/product_img/Fusid-plus.jpg", desc: "Square Pharmaceuticals" },
+            // ACME
+            { id: 511, name: "Vitalamino (500ml)", category: "medicine", price: 520, stock: 30, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 512, name: "Vita-D (500ml)", category: "medicine", price: 360, stock: 40, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 513, name: "Auritox-Plus (500ml)", category: "medicine", price: 540, stock: 25, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 514, name: "Dilores (100ml)", category: "medicine", price: 290, stock: 50, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 515, name: "E-Vet (100ml)", category: "medicine", price: 310, stock: 45, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 516, name: "Acidifire (500ml)", category: "medicine", price: 480, stock: 30, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 517, name: "Aminosafe (1000ml)", category: "medicine", price: 780, stock: 20, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 518, name: "Xylose (1000ml)", category: "medicine", price: 820, stock: 15, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 519, name: "Safe Zink (1000ml)", category: "medicine", price: 760, stock: 25, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            { id: 520, name: "Safe Cal (1000ml)", category: "medicine", price: 740, stock: 25, unit: "pc", image: "images.jpeg", desc: "ACME Laboratories" },
+            // Tecno
+            { id: 521, name: "Vitazink (1000ml)", category: "medicine", price: 720, stock: 20, unit: "pc", image: "images.jpeg", desc: "Tecno Drugs" },
+            { id: 522, name: "Ciprosol (1000ml)", category: "medicine", price: 880, stock: 15, unit: "pc", image: "images.jpeg", desc: "Tecno Drugs" },
+            { id: 523, name: "Levosal (500ml)", category: "medicine", price: 460, stock: 30, unit: "pc", image: "images.jpeg", desc: "Tecno Drugs" },
+            { id: 524, name: "Florte (100ml)", category: "medicine", price: 300, stock: 50, unit: "pc", image: "images.jpeg", desc: "Tecno Drugs" },
+            // ACI
+            { id: 525, name: "Hepamin (1000ml)", category: "medicine", price: 920, stock: 15, unit: "pc", image: "images.jpeg", desc: "ACI Animal Health" },
+            { id: 526, name: "No-IBH (500ml)", category: "medicine", price: 540, stock: 25, unit: "pc", image: "images.jpeg", desc: "ACI Animal Health" },
+            { id: 527, name: "Pathonil (100ml)", category: "medicine", price: 320, stock: 45, unit: "pc", image: "images.jpeg", desc: "ACI Animal Health" },
+            { id: 528, name: "Nephroflore (500ml)", category: "medicine", price: 560, stock: 20, unit: "pc", image: "images.jpeg", desc: "ACI Animal Health" },
+            { id: 529, name: "Anpan (100ml)", category: "medicine", price: 300, stock: 50, unit: "pc", image: "images.jpeg", desc: "ACI Animal Health" },
+            { id: 530, name: "Fra-12 (100ml)", category: "medicine", price: 340, stock: 40, unit: "pc", image: "images.jpeg", desc: "ACI Animal Health" },
+            { id: 531, name: "Broncho (1000ml)", category: "medicine", price: 890, stock: 15, unit: "pc", image: "images.jpeg", desc: "ACI Animal Health" },
+            { id: 532, name: "PGED (400ml)", category: "medicine", price: 460, stock: 30, unit: "pc", image: "images.jpeg", desc: "ACI Animal Health" },
+            { id: 533, name: "Lisoplus (10g)", category: "medicine", price: 90, stock: 100, unit: "packet", image: "images.jpeg", desc: "ACI Animal Health" }
+        ];
+
+        function init() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    products = JSON.parse(stored);
+                } catch (e) {
+                    console.error("Admin: Error parsing storage", e);
+                    products = initialProducts;
+                }
+            } else {
+                products = initialProducts;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+            }
+
+            posts = JSON.parse(localStorage.getItem(POSTS_KEY)) || [];
+            activityLogs = JSON.parse(localStorage.getItem(LOG_KEY)) || [];
+
+            if (sessionStorage.getItem('admin_logged_in')) {
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                updateStats();
+                renderTable();
+                renderBlogTable();
+                renderLogs();
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const pBtn = document.getElementById('tab-products');
+            const bBtn = document.getElementById('tab-blog');
+            const pSec = document.querySelectorAll('.lg\\:col-span-3')[0]; // First col-span-3 is product section
+            const bSec = document.getElementById('blog-section');
+
+            if (tab === 'products') {
+                pBtn.classList.add('bg-gray-700', 'text-white');
+                pBtn.classList.remove('text-gray-400');
+                bBtn.classList.remove('bg-gray-700', 'text-white');
+                bBtn.classList.add('text-gray-400');
+
+                pSec.classList.remove('hidden');
+                bSec.classList.add('hidden');
+            } else {
+                bBtn.classList.add('bg-gray-700', 'text-white');
+                bBtn.classList.remove('text-gray-400');
+                pBtn.classList.remove('bg-gray-700', 'text-white');
+                pBtn.classList.add('text-gray-400');
+
+                pSec.classList.add('hidden');
+                bSec.classList.remove('hidden');
+            }
+        }
+
+        // ... Login / Logout / LogActivity ... (Existing functions)
+
+        function renderBlogTable() {
+            const tbody = document.getElementById('admin-blog-list');
+            const emptyState = document.getElementById('empty-blog-state');
+
+            if (posts.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                tbody.innerHTML = posts.map(p => `
+                    <tr class="hover:bg-white/5 border-b border-gray-800 transition duration-200 group">
+                        <td class="p-5 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg overflow-hidden border border-gray-700"><img src="${p.image}" class="w-full h-full object-cover"></div>
+                            <div>
+                                <div class="font-bold text-white text-sm line-clamp-1">${p.title}</div>
+                                <div class="text-[10px] text-gray-500">ID: ${p.id}</div>
+                            </div>
+                        </td>
+                        <td class="p-5"><span class="px-2 py-1 rounded bg-blue-900/30 border border-blue-500/30 text-xs font-bold text-blue-400">${p.category}</span></td>
+                        <td class="p-5 text-xs text-gray-300">${p.date}<br><span class="text-gray-500">${p.readTime}</span></td>
+                        <td class="p-5 text-right">
+                             <button onclick="openModal('edit-post', ${p.id})" class="text-blue-400 hover:text-blue-300 mr-3"><i class="fa-solid fa-pen-to-square"></i></button>
+                             <button onclick="deletePost(${p.id})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // ... CRUD for Products ...
+
+        function savePost(e) {
+            e.preventDefault();
+            const id = document.getElementById('post-id').value;
+            const newPost = {
+                id: id ? parseInt(id) : Date.now(),
+                title: document.getElementById('post-title').value,
+                category: document.getElementById('post-category').value,
+                image: document.getElementById('post-image').value,
+                desc: document.getElementById('post-desc').value,
+                date: document.getElementById('post-date').value,
+                readTime: document.getElementById('post-readTime').value
+            };
+
+            if (id) {
+                const idx = posts.findIndex(p => p.id == id);
+                posts[idx] = newPost;
+                logActivity(`Edited Post: ${newPost.title}`);
+            } else {
+                posts.push(newPost);
+                logActivity(`Added Post: ${newPost.title}`);
+            }
+
+            localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+            renderBlogTable();
+            closeModal();
+        }
+
+        function deletePost(id) {
+            if (confirm('Delete this post?')) {
+                posts = posts.filter(x => x.id !== id);
+                localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+                logActivity(`Deleted Post ID: ${id}`);
+                renderBlogTable();
+            }
+        }
+
+        function exportCSV() {
+            if (currentTab === 'products') {
+                let csv = 'ID,Name,Category,Price,Stock,Unit\n';
+                products.forEach(p => {
+                    csv += `${p.id},${p.name},${p.category},${p.price},${p.stock},${p.unit}\n`;
+                });
+                downloadCSV(csv, 'akhi_products.csv');
+            } else {
+                let csv = 'ID,Title,Category,Date,ReadTime\n';
+                posts.forEach(p => {
+                    csv += `${p.id},"${p.title}",${p.category},"${p.date}",${p.readTime}\n`;
+                });
+                downloadCSV(csv, 'akhi_blog_posts.csv');
+            }
+            logActivity('Exported CSV');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+        }
+
+        // ... Update Stats ...
+        function updateStats() {
+            document.getElementById('stat-total-products').innerText = products.length;
+            document.getElementById('stat-low-stock').innerText = products.filter(p => p.stock < 10).length;
+            document.getElementById('stat-stock-value').innerText = products.reduce((acc, p) => acc + (p.price * p.stock), 0).toLocaleString();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            if (document.getElementById('admin-pin').value === PIN) {
+                sessionStorage.setItem('admin_logged_in', 'true');
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                updateStats();
+                renderTable();
+                renderBlogTable();
+                renderLogs();
+            } else {
+                document.getElementById('error-msg').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('admin_logged_in');
+            window.location.reload();
+        }
+
+        function logActivity(action) {
+            const log = { action, time: new Date().toLocaleString() };
+            activityLogs.unshift(log);
+            if (activityLogs.length > 20) activityLogs.pop();
+            localStorage.setItem(LOG_KEY, JSON.stringify(activityLogs));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const el = document.getElementById('activity-log');
+            if (activityLogs.length === 0) return;
+            el.innerHTML = activityLogs.map(l => `
+                <div class="text-xs border-l-2 border-green-500 pl-3 py-1 fade-in">
+                    <p class="text-gray-300 font-medium">${l.action}</p>
+                    <p class="text-gray-600 text-[10px]">${l.time}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderTable() {
+            const filter = document.getElementById('category-filter').value;
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const tbody = document.getElementById('admin-product-list');
+            const emptyState = document.getElementById('empty-state');
+
+            const filtered = products.filter(p => {
+                const matchCat = filter === 'all' || p.category === filter;
+                const matchSearch = p.name.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                tbody.innerHTML = filtered.map(p => `
+                    <tr class="hover:bg-white/5 border-b border-gray-800 transition duration-200 group">
+                        <td class="p-5 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg overflow-hidden border border-gray-700"><img src="${p.image}" class="w-full h-full object-cover"></div>
+                            <div>
+                                <div class="font-bold text-white text-sm line-clamp-1">${p.name}</div>
+                                <div class="text-[10px] text-gray-500">ID: ${p.id}</div>
+                            </div>
+                        </td>
+                        <td class="p-5"><span class="px-2 py-1 rounded bg-gray-800 border border-gray-700 text-xs font-bold uppercase text-gray-400">${p.category}</span></td>
+                        <td class="p-5"><div class="font-bold text-green-400">৳${p.price}</div></td>
+                        <td class="p-5">
+                            <div class="flex items-center gap-2 bg-gray-900 rounded-lg w-fit p-1 border border-gray-700">
+                                <button onclick="quickStock(${p.id}, -1)" class="w-6 h-6 flex items-center justify-center rounded hover:bg-red-500/20 text-red-400 hover:text-red-300 transition">-</button>
+                                <span class="text-xs font-bold w-12 text-center text-white">${p.stock} <span class="text-[9px] text-gray-500">${p.unit}</span></span>
+                                <button onclick="quickStock(${p.id}, 1)" class="w-6 h-6 flex items-center justify-center rounded hover:bg-green-500/20 text-green-400 hover:text-green-300 transition">+</button>
+                            </div>
+                        </td>
+                        <td class="p-5 text-right">
+                             <button onclick="openModal('edit', ${p.id})" class="text-blue-400 hover:text-blue-300 mr-3"><i class="fa-solid fa-pen-to-square"></i></button>
+                             <button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            updateStats();
+        }
+
+        function quickStock(id, change) {
+            const p = products.find(x => x.id === id);
+            if (p) {
+                p.stock += change;
+                if (p.stock < 0) p.stock = 0;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+                logActivity(`Updated stock for ${p.name}: ${change > 0 ? '+' : ''}${change}`);
+                renderTable();
+            }
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('p-id').value;
+            const newProd = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('p-name').value,
+                category: document.getElementById('p-category').value,
+                price: parseFloat(document.getElementById('p-price').value),
+                stock: parseInt(document.getElementById('p-stock').value),
+                unit: document.getElementById('p-unit').value,
+                image: document.getElementById('p-image').value,
+                desc: document.getElementById('p-desc').value
+            };
+
+            if (id) {
+                const idx = products.findIndex(p => p.id == id);
+                products[idx] = newProd;
+                logActivity(`Edited product: ${newProd.name}`);
+            } else {
+                products.push(newProd);
+                logActivity(`Added new product: ${newProd.name}`);
+            }
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+            renderTable();
+            closeModal();
+        }
+
+        function deleteProduct(id) {
+            const p = products.find(x => x.id === id);
+            if (confirm('Delete this product?')) {
+                products = products.filter(x => x.id !== id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+                logActivity(`Deleted product: ${p.name}`);
+                renderTable();
+            }
+        }
+
+        function openModal(mode, id = null) {
+            if (mode === 'add-post' || mode === 'edit-post') {
+                document.getElementById('blog-modal').classList.remove('hidden');
+                document.getElementById('product-modal').classList.add('hidden'); // Ensure other is closed
+
+                if (mode === 'edit-post') {
+                    document.getElementById('blog-modal-title').innerText = 'Edit Post';
+                    const p = posts.find(x => x.id === id);
+                    document.getElementById('post-id').value = p.id;
+                    document.getElementById('post-title').value = p.title;
+                    document.getElementById('post-category').value = p.category;
+                    document.getElementById('post-image').value = p.image;
+                    document.getElementById('post-desc').value = p.desc;
+                    document.getElementById('post-date').value = p.date;
+                    document.getElementById('post-readTime').value = p.readTime;
+                } else {
+                    document.getElementById('blog-modal-title').innerText = 'New Blog Post';
+                    document.getElementById('blog-form').reset();
+                    document.getElementById('post-id').value = '';
+                }
+                return;
+            }
+
+            // Product Modal Logic
+            document.getElementById('product-modal').classList.remove('hidden');
+            document.getElementById('blog-modal').classList.add('hidden');
+            if (mode === 'edit') {
+                document.getElementById('modal-title').innerText = 'Edit Product';
+                const p = products.find(x => x.id === id);
+                document.getElementById('p-id').value = p.id;
+                document.getElementById('p-name').value = p.name;
+                document.getElementById('p-category').value = p.category;
+                document.getElementById('p-price').value = p.price;
+                document.getElementById('p-stock').value = p.stock;
+                document.getElementById('p-unit').value = p.unit;
+                document.getElementById('p-image').value = p.image;
+                document.getElementById('p-desc').value = p.desc;
+            } else {
+                document.getElementById('modal-title').innerText = 'Add New Product';
+                document.getElementById('product-form').reset();
+                document.getElementById('p-id').value = '';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+            document.getElementById('blog-modal').classList.add('hidden');
+        }
+        init();
+    </script>
+</body>
+
+</html>
