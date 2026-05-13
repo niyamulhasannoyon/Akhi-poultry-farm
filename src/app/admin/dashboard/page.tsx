@@ -15,7 +15,8 @@ import {
   Box,
   ChevronRight,
   Loader2,
-  ArrowRight
+  ArrowRight,
+  Lock
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -210,6 +211,46 @@ const AdminDashboard = () => {
           </>
         ) : activeTab === "orders" ? (
           <AdminOrders />
+        ) : activeTab === "settings" ? (
+          <div className="max-w-2xl mx-auto">
+            <header className="mb-12">
+              <h2 className="text-3xl font-bold text-white mb-2">সেটিংস</h2>
+              <p className="text-gray-500 text-sm">আপনার একাউন্টের সিকিউরিটি ম্যানেজ করুন</p>
+            </header>
+
+            <div className="premium-card p-10 space-y-8">
+              <div className="flex items-center gap-6 pb-8 border-b border-white/5">
+                <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center text-3xl text-emerald-500 font-black">
+                  {user?.email?.[0].toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">{user?.email}</h3>
+                  <p className="text-sm text-gray-500">এডমিন একাউন্ট</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-emerald-500" /> পাসওয়ার্ড পরিবর্তন
+                </h4>
+                <p className="text-sm text-gray-500">আপনার পাসওয়ার্ড রিসেট করার জন্য নিচের বাটনে ক্লিক করুন। আপনার ইমেইলে একটি ভেরিফিকেশন লিঙ্ক পাঠানো হবে।</p>
+                <button
+                  onClick={async () => {
+                    try {
+                      const { sendPasswordResetEmail } = await import("firebase/auth");
+                      await sendPasswordResetEmail(auth, user.email);
+                      toast.success("পাসওয়ার্ড রিসেট লিঙ্ক পাঠানো হয়েছে!");
+                    } catch (error) {
+                      toast.error("লিঙ্ক পাঠাতে সমস্যা হয়েছে");
+                    }
+                  }}
+                  className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold transition-all flex items-center gap-2"
+                >
+                  পাসওয়ার্ড রিসেট ইমেইল পাঠান
+                </button>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="premium-card p-20 text-center text-gray-500">
             <Settings className="w-16 h-16 mx-auto mb-4 opacity-5" />

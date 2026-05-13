@@ -60,6 +60,20 @@ const AdminLogin = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error("অনুগ্রহ করে আগে আপনার ইমেইলটি লিখুন!");
+      return;
+    }
+    try {
+      const { sendPasswordResetEmail } = await import("firebase/auth");
+      await sendPasswordResetEmail(auth, email);
+      toast.success("পাসওয়ার্ড রিসেট লিঙ্ক আপনার ইমেইলে পাঠানো হয়েছে!");
+    } catch (error: any) {
+      toast.error("লিঙ্ক পাঠাতে সমস্যা হয়েছে। ইমেইলটি সঠিক কিনা চেক করুন।");
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#050505] relative overflow-hidden px-4">
       {/* Decorative Glows */}
@@ -108,6 +122,15 @@ const AdminLogin = () => {
                 className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500/50"
                 placeholder="••••••••"
               />
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-xs text-emerald-500 hover:text-emerald-400 font-bold transition"
+              >
+                পাসওয়ার্ড ভুলে গেছেন?
+              </button>
             </div>
           </div>
 
