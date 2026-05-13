@@ -84,7 +84,7 @@ const Navbar = () => {
       <nav
         className={cn(
           "fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
-          isScrolled ? "py-4 px-4" : "py-6 px-4"
+          isScrolled ? "py-4 px-4" : "py-10 px-4"
         )}
       >
         <div 
