@@ -53,8 +53,8 @@ const AdminLogin = () => {
         toast.error("এই ইমেইলটি এডমিন হিসেবে অনুমোদিত নন!");
       }
     } catch (error: any) {
-      toast.error("গুগল লগইন ব্যর্থ হয়েছে!");
-      console.error(error);
+      console.error("Google Login Error:", error);
+      toast.error(`গুগল লগইন ব্যর্থ হয়েছে: ${error.message || "আবার চেষ্টা করুন"}`);
     } finally {
       setLoading(false);
     }
