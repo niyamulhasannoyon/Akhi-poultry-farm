@@ -26,6 +26,8 @@ interface Order {
     address: string;
   };
   items: any[];
+  subtotal?: number;
+  deliveryCharge?: number;
   total: number;
   status: "PENDING" | "PROCESSING" | "CONFIRMED" | "CANCELLED" | "PAID";
   createdAt: any;
